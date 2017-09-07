@@ -1,0 +1,87 @@
+#!/usr/bin/env ruby
+# Copyright (c) 2016 Giuseppe Lavagetto, Wikimedia Foundation
+#               2017 Andrew Otto, Wikimedia Foundation
+# Loosely based on https://github.com/ripienaar/mcollective-choria/blob/master/lib/mcollective/util/choria.rb
+
+# This class exists purely to help override restrictions that Puppet CA places on x509
+# certificate extensions.  Attempting run puppet cert sign on the CLI for a CSR that
+# specifies things like wildcard SANs, or BasicConstraints will fail with a
+# CertificateSigningError.  This code monkey patches Puppet::SSL::CertificateAuthority
+# to rescue and pass on exceptions thrown by these types of x509 extensions in the CSR.
+
+require 'json'
+require 'logger'
+require 'openssl'
+require 'optparse'
+
+require 'puppet'
+require 'puppet/ssl/certificate_authority'
+require 'puppet/util/command_line'
+
+class PuppetCertifcateSignError < StandardError
+end
+
+
+Log = Logger.new(STDOUT)
+
+Log.level = Logger::INFO
+Log.formatter = proc do |severity, datetime, _, msg|
+  date_format = datetime.strftime("%Y-%m-%d %H:%M:%S")
+  format("%s %-5s (puppet-sign-cert): %s\n", date_format, severity, msg)
+end
+
+
+
+module Puppet
+  module SSL
+    # Extend the signing checks
+    module CertificateAuthorityExtensions
+      def check_internal_signing_policies(hostname, csr, _allow_dns_alt_names)
+        super(hostname, csr, true)
+      rescue Puppet::SSL::CertificateAuthority::CertificateSigningError => e
+        if e.message.start_with?("CSR '#{csr.name}' subjectAltName contains a wildcard")
+          true
+        elsif e.message.start_with?("CSR has request extensions that are not permitted")
+          true
+        else
+          raise
+        end
+      end
+    end
+    # Extend the base class
+    class CertificateAuthority
+      prepend Puppet::SSL::CertificateAuthorityExtensions
+    end
+  end
+end
+
+
+def sign_csr(common_name)
+  Log.info "Signing the certificate for #{common_name}"
+  # Now sign the cert using puppet's own commandline interpreter
+  Puppet::Util::CommandLine.new('cert', ['sign', common_name]).execute
+end
+
+
+# Ruby main :)
+if __FILE__ == $0;
+  OptionParser.new do |opts|
+    opts.banner = "Usage: puppet-sign-cert <common_name>"
+
+    opts.on('-d', '--debug', 'Show debug information') do
+      Log.level = Logger::DEBUG
+    end
+  end.parse!
+
+  common_name = ARGV.shift || ''
+
+  fail(PuppetCertifcateSignError, 'You must provide a common name') unless common_name != ''
+
+  begin
+    sign_csr(common_name)
+  rescue PuppetCertifcateSignError => e
+    Log.error "#{e.message}"
+    exit 1
+  end
+
+end

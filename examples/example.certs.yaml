@@ -1,0 +1,111 @@
+# Each entry in this manifest is expected to contain kwargs for a local Certficiate instance,
+# Or be kwargs to instantiate a different subclass of AbstractSigner.  If you are configuring
+# a non-local Certificate authority, you must specify a class_name: fully.qualified.ClassName to a
+# implementing subclass of AbstractSigner.  fully.qualified.ClassName must be importable
+# on PYTHONPATH.  If 'class_name' is not given in a specific manifest, it is assumed to be
+# cergen.certificate.Certificate.
+
+
+# This is a non local certifcate authority.  It is implemented
+# by the PuppetCA class.
+puppet_ca:
+  class_name: puppet
+  hostname: p-1
+
+# The rest of these are all local Certificates,
+# some of which are Authorties of others.
+root_authority:
+  is_authority: true
+  path_length: 10
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: CA
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# intermediate_ca's CA is root_ca.
+intermediate_authority:
+  is_authority: true
+  authority: root_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: VA
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# hostname1 is signed directly by root_ca
+hostname1.example.org:
+  authority: root_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: US
+  alt_names: [me.we.you, fine.com, woohoo.org]
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# hostname2 is signed by intermediate_ca
+hostname2.example.org:
+  authority: intermediate_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: US
+  alt_names: [me.we.you, fine.com, "*.woohoo.org"]
+  expiry: 365 # 365 days from now
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# hostname3 is signed by the puppet CA
+hostname3.example.org:
+  authority: puppet_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: CA
+  alt_names: [me.we.you, fine.com, "*.example.org"]
+  # PuppetCA will not respect custom expiration dates, so to avoid a warning, set this to null.
+  # An expiration date of 5 years from now will be given by Puppet when it signs the CSR.
+  expiry: null
+  key:
+    password: qwerty
+    algorithm: ec
+
+# puppet_intermediate_ca is an intermediate local Certificate CA, that itself
+# is signed by the puppet CA.
+puppet_intermediate_ca:
+  is_authority: true
+  authority: puppet_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: VA
+  alt_names: ["*.example.org"]
+  # PuppetCA will not respect custom expiration dates, so to avoid a warning, set this to null.
+  # An expiration date of 5 years from now will be given by Puppet when it signs the CSR.
+  expiry: null
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# hostname4 is signed by the intermediate puppet ca
+hostname4.example.org:
+  authority: puppet_intermediate_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: CA
+  alt_names: [me.we.you, fine.com, "*.wikimedia.org"]
+  key:
+    password: qwerty
+    algorithm: ec
+
+# This is a self signed certificate, that is not
+# allowed to be a CA for other Certificates.
+self_signed_cert:
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: CA
+  expiry: 2120-01-01T00:00:00Z # explicit expiry date
+  key:
+    password: qwerty
+    algorithm: rsa

@@ -1,0 +1,33 @@
+root_ca:
+  is_authority: true
+  path_length: 10
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: CA
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# intermediate_ca is signed by root_ca.
+intermediate_ca:
+  is_authority: true
+  authority: root_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: VA
+  key:
+    algorithm: rsa
+    password: qwerty
+
+# hostname1 is signed by intermediate_ca
+hostname1.example.org:
+  authority: intermediate_ca
+  subject:
+    country_name: US
+    STATE_OR_PROVINCE_NAME: US
+  alt_names: [me.we.you, fine.com, "*.woohoo.org"]
+  expiry: 365 # 365 days from now
+  key:
+    algorithm: rsa
+    password: qwerty
+
