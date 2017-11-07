@@ -20,12 +20,12 @@ setup(
     install_requires=[
         'docopt>=0.6',
         'pyyaml>=3',
-        'cryptography>=0.6',
+        'cryptography>=1.7.0',
         # networkx released 2.x in September 2017.
         # We want a version with Debian packages.
         'networkx<2.0',
         'requests>=2',
-        'pyOpenSSL>=0.14'
+        'pyOpenSSL>=16.0.0'
         # Also need installed
         # python3-dev
         # libffi-dev
