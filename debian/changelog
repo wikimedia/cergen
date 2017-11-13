@@ -1,0 +1,5 @@
+cergen (0.1.0-1) jessie-wikimedia; urgency=low
+
+  * Initial debian wikimedia release
+
+ -- Andrew Otto (WMF) <otto@wikimedia.org>  Wed, 18 Oct 2017 14:33:20 -0500

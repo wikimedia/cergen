@@ -1,0 +1,33 @@
+Source: cergen
+Maintainer: Andrew Otto (WMF) <otto@wikimedia.org>
+Section: utils
+Priority: optional
+Build-Depends:
+ debhelper (>= 9),
+ dh-python,
+ python3-all (>= 3.4.0),
+ python3-setuptools (>= 5.5.1),
+ python3-docopt,
+ python3-requests,
+ python3-yaml,
+ python3-pytest,
+ python3-pytest-runner,
+ python3-cryptography (>= 1.7.0),
+ python3-openssl (>=16.0.0),
+ python3-networkx (< 2.0.0),
+ openssl,
+ default-jre-headless | java8-runtime-headless
+Standards-Version: 3.9.3
+
+Package: cergen
+Architecture: all
+Depends:
+ ${misc:Depends},
+ ${python3:Depends},
+ python3-cryptography (>= 1.7.0),
+ python3-openssl (>= 16.0.0),
+ python3-networkx (< 2.0.0),
+ openssl,
+ default-jre-headless | java8-runtime-headless
+Provides: ${python3:Provides}
+Description: Generates asymmetric keys and x509 certificate files declared in a YAML manifest.

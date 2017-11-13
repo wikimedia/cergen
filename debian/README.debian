@@ -1,0 +1,6 @@
+To build on a WMF build server:
+
+  BACKPORTS=yes GIT_PBUILDER_AUTOCONF=no DIST=jessie WIKIMEDIA=yes gbp buildpackage -sa -us -uc --git-builder=git-pbuilder
+
+We need BACKPORTS=yes to build for Jessie, as some of the Python dependencies
+don't have recent enough versions build for Jessie main.

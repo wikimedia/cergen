@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+#export DH_VERBOSE=1
+export PYBUILD_NAME=cergen
+export PYBUILD_TEST_PYTEST=1
+export PYBUILD_TEST_ARGS=$(CURDIR)/tests
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_clean:
+	# Skip the default dh_auto_clean.
+	# pytest-runner is run at this point, and tries to download stuff from PyPI.
+	# We don't need to run clean, as we build in a temporary discardable chroot
+	# anyway.
