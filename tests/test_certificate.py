@@ -41,7 +41,8 @@ def test_generate(certificate):
         'p12_file should exist'
     assert os.path.exists(certificate.jks_file), \
         'jks_file should exist'
-
+    assert os.path.exists(certificate.truststore_jks_file), \
+        'truststore_jks_file should exist'
 
 def test_authority_methods(certificate):
     """

@@ -158,6 +158,9 @@ class Certificate(AbstractSigner):
         self.p12_file = os.path.join(self.path, '{}.keystore.p12'.format(self.name))
         # Java Keystore file
         self.jks_file = os.path.join(self.path, '{}.keystore.jks'.format(self.name))
+        # Java 'truststore' Keystore file.  This is a Java keystore
+        # with this Certificate's authority certificate only.
+        self.truststore_jks_file = os.path.join(self.path, 'truststore.jks')
 
         self.read_only = read_only
 
@@ -257,6 +260,7 @@ class Certificate(AbstractSigner):
         # TODO: maybe rename these subordinate generate methods?
         self.generate_p12(force=force)
         self.generate_keystore(force=force)
+        self.generate_truststore(force=force)
 
     def generate_crt(self, force=False):
         """
@@ -463,6 +467,41 @@ class Certificate(AbstractSigner):
                         self.authority, self.authority.name, self.jks_file
                     )
                 )
+
+    def generate_truststore(self, force=False):
+        if not self.should_generate(self.truststore_jks_file, force):
+            return False
+
+        # keytool -keystore puppet_ca.truststore.jks
+        # -alias puppet_ca -import -file /var/lib/puppet/ssl/certs/ca.pem
+        command = [
+            KEYTOOL,
+            '-import',
+            '-noprompt',
+            '-alias', self.authority.name,
+            '-file', self.authority.crt_file,
+            '-storepass', self.key.password,
+            '-keystore', self.truststore_jks_file
+        ]
+
+        self.log.info(
+            'Generating Java truststore file with CA certificate {}'.format(self.authority)
+        )
+        if not run_command(command, creates=self.truststore_jks_file):
+            raise RuntimeError(
+                'Java truststore generation and import of CA certificate failed', self
+            )
+
+        # Verify that the CA cert is in the Java truststore.
+        if not is_in_keystore(self.authority.name, self.truststore_jks_file, self.key.password):
+            raise RuntimeError(
+                'Java truststore generation and import of CA certificate '
+                'succeeded, but a certificate for {} is not in {}.  '
+                'This should not happen'.format(
+                    self.authority.name, self.truststore_jks_file
+                )
+            )
+
     # TODO: generate other concatenated formats of .pem files and keystores:
     #  “cert chain”, “key + cert”, and “key + cert chain”. ?
     # "key + all but root chain"?
@@ -479,7 +518,8 @@ class Certificate(AbstractSigner):
             self.key.public_key_file,
             self.crt_file,
             self.p12_file,
-            self.jks_file
+            self.jks_file,
+            self.truststore_jks_file
         ]:
             if os.path.exists(p):
                 mtime = datetime.datetime.fromtimestamp(os.path.getmtime(p)).isoformat()

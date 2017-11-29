@@ -114,7 +114,7 @@ implements AbstractSigner, as a local Certifiate can always at least sign itself
 
 cergen ships with one external authority: PuppetCA.  This uses the Puppet CA HTTP API
 to submit CSRs, and then shells out to a ruby script to get Puppet to sign a CSR.  PuppetCA
-can only be used if you are running cergen on a puppet master.  To declare a PuppetCA
+can only be used if you are running cergen on your puppet CA host.  To declare a PuppetCA
 in your manifest, you may set `class_name: puppet` and any other PuppetCA constructor kwargs.
 
 

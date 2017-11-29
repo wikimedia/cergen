@@ -53,7 +53,7 @@ class PuppetCA(AbstractSigner):
         agent_private_key_file=None,
         environment='production'
     ):
-        self._name = '{}:{}'.format(hostname, port)
+        self._name = '{}_{}'.format(hostname, port)
         super().__init__()
 
         if sign_command is None:
