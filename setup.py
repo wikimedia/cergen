@@ -20,7 +20,7 @@ setup(
     install_requires=[
         'docopt>=0.6',
         'pyyaml>=3',
-        'cryptography>=1.7.0',
+        'cryptography>=1.7.0,<2.0.0',
         # networkx released 2.x in September 2017.
         # We want a version with Debian packages.
         'networkx<2.0',
