@@ -41,9 +41,9 @@ class Certificate(AbstractSigner):
     def __init__(
         self,
         name,
-        subject,
         key,
         path,
+        subject=None,
         private_path=None,
         alt_names=None,
         expiry=365,
@@ -58,15 +58,17 @@ class Certificate(AbstractSigner):
         Args:
             name (str): Name of this Certificate. This will be the common_name.
 
-            subject (dict):
-                x509 subject names to values.  Keys should match symbol
-                names in the cryptography.x509.oid.NameOID module.
-
             key (dict or Key):
                 An instance of a Key, or kwargs to pass to the Key constructor.
 
             path (str):
                 Path to directory where files are generated and stored.
+
+            subject (dict):
+                x509 subject names to values.  Keys should match symbol
+                names in the cryptography.x509.oid.NameOID module.
+                COMMON_NAME will be set to name.
+                Defaults to None (empty subject).
 
             private_path (str, optional):
                 Path to directory where private key files are generated and stored.
@@ -116,6 +118,9 @@ class Certificate(AbstractSigner):
             key.setdefault('path', self.path)
             key.setdefault('private_path', self.private_path)
             self.key = Key(**key)
+
+        if subject is None:
+            subject = {}
 
         # Use the name of this cert as the subject common name
         subject['COMMON_NAME'] = name

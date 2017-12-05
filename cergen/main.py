@@ -33,10 +33,10 @@ Options:
                                     loaded files from that directory. [default: *.certs.yaml]
 
     -b --base-path=<path>           Default directory in which generated files will be stored.
-                                    [default: ./certificates/certs]
+                                    [default: ./certificates]
 
     -B --base-private-path=<path>   Default directory in which generated private key files
-                                    will be stored. [default: ./certificates/private]
+                                    will be stored. Defaults to value of --base-path.
 
 
     -v --verbose                    Enable verbose debug logging.

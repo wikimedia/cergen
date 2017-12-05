@@ -69,7 +69,7 @@ def test_authority_methods(certificate):
         'cert_file() should return path to generated crt_file'
 
 
-def test_cert(certificate):
+def test_cert(certificate, certificate_kwargs):
     """
     Test that cert() returns a cryptography x509 certificate with the correct values
     """
@@ -79,6 +79,23 @@ def test_cert(certificate):
         NameOID.COMMON_NAME
     )[0].value == certificate.name, \
         'common_name in x509_cert subject should be the same as certicicate\'s name'
+    assert x509_cert.subject.get_attributes_for_oid(
+        NameOID.COUNTRY_NAME
+    )[0].value == certificate_kwargs['subject']['country_name'], \
+        'country_name in x509_cert subject should be the same as certicicate\'s country_name'
+
+def test_cert_empty_subject(certificate_empty_subject):
+    """
+    Test that cert() returns a cryptography x509 certificate with an empty subject.
+    Only common_name should be in subject.
+    """
+    certificate_empty_subject.generate()
+    x509_cert = certificate_empty_subject.cert
+    assert x509_cert.subject.get_attributes_for_oid(
+        NameOID.COMMON_NAME
+    )[0].value == certificate_empty_subject.name, \
+        'common_name in x509_cert subject should be the same as certicicate\'s name'
+
 
 
 def test_load(certificate, certificate_kwargs):
@@ -94,7 +111,7 @@ def test_load(certificate, certificate_kwargs):
         'crt_file exists, so new Certificate should load it from file'
     # Run test_cert() with this loaded certificate to ensure
     # it is loaded properly
-    test_cert(c)
+    test_cert(c, certificate_kwargs)
 
 
 def test_should_generate_read_only(certificate):
