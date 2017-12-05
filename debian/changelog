@@ -1,3 +1,10 @@
+cergen (0.1.1-1) jessie-wikimedia; urgency=low
+
+  * Support empty subjects
+  * Default --base-private-path to --base-path
+
+ -- Andrew Otto (WMF) <otto@wikimedia.org>  Wed, 5 Nov 2017 15:09:45 -0500
+
 cergen (0.1.0-1) jessie-wikimedia; urgency=low
 
   * Initial debian wikimedia release
