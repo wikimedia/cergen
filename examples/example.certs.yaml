@@ -14,7 +14,7 @@ puppet_ca:
 
 # The rest of these are all local Certificates,
 # some of which are Authorties of others.
-root_authority:
+root_ca:
   is_authority: true
   path_length: 10
   subject:
@@ -25,7 +25,7 @@ root_authority:
     password: qwerty
 
 # intermediate_ca's CA is root_ca.
-intermediate_authority:
+intermediate_ca:
   is_authority: true
   authority: root_ca
   subject:
