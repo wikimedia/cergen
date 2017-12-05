@@ -152,6 +152,3 @@ Certificates are Signers, in that they can always at least sign themselves.  Cer
 that can sign other certificates are considered to be 'authorities'.  cergen
 originally used the term 'Authority' rather than 'Signer', but this was found
 conflate the usual conceptual hierarchy of certificates and authorities.
-
-
-

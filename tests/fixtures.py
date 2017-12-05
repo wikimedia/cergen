@@ -76,6 +76,14 @@ def certificate(certificate_kwargs, scope='function'):
     from cergen.certificate import Certificate
     return Certificate(**certificate_kwargs)
 
+@fixture
+def certificate_empty_subject(certificate_kwargs, scope='function'):
+    """
+    Certificate instance in temp directory
+    """
+    from cergen.certificate import Certificate
+    del certificate_kwargs['subject']
+    return Certificate(**certificate_kwargs)
 
 @fixture
 def key_kwargs(tmpdir, scope='function'):
