@@ -1,3 +1,9 @@
+cergen (0.2.0-1) jessie-wikimedia; urgency=low
+
+  * Support Puppet 4 CA, remove support for Puppet 3 CA.
+
+ -- Andrew Otto (WMF) <otto@wikimedia.org>  Wed, 14 Nov 2017 11:36:10 -0500
+
 cergen (0.1.1-1) jessie-wikimedia; urgency=low
 
   * Support empty subjects
