@@ -1,3 +1,6 @@
+# 0.2.0
+- puppet-sign-cert now only works with Puppet 4.
+
 # 0.1.1
 
 - Support empty subjects.
