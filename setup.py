@@ -25,10 +25,12 @@ setup(
         # We want a version with Debian packages.
         'networkx<2.0',
         'requests>=2',
-        'pyOpenSSL>=16.0.0'
+        # 17.5.0 requires cryptography 2.1.4
+        'pyOpenSSL>=16.0.0,<17.5.0',
         # Also need installed
         # python3-dev
         # libffi-dev
+        # libssl-dev
     ],
     long_description=long_description,
     entry_points={'console_scripts': ['cergen = cergen.main:main']},
