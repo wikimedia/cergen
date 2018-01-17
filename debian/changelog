@@ -1,3 +1,9 @@
+cergen (0.2.1-1) jessie-wikimedia; urgency=low
+
+  * Now generate ca.crt.pem files in each certificate directory
+
+ -- Andrew Otto (WMF) <otto@wikimedia.org>  Wed, 17 Jan 2018 15:31:06 +0000
+
 cergen (0.2.0-1) jessie-wikimedia; urgency=low
 
   * Support Puppet 4 CA, remove support for Puppet 3 CA.
