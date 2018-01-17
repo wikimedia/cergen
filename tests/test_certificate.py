@@ -37,6 +37,8 @@ def test_generate(certificate):
         'crt_file should exist'
     assert os.path.exists(certificate.csr_file), \
         'csr_file should exist'
+    assert os.path.exists(certificate.ca_crt_file), \
+        'ca_crt_file should exist'
     assert os.path.exists(certificate.p12_file), \
         'p12_file should exist'
     assert os.path.exists(certificate.jks_file), \

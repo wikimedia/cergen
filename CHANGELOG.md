@@ -1,3 +1,6 @@
+# 0.2.1
+- Now also generate ca.crt.pem files in each certificate directory.
+
 # 0.2.0
 - puppet-sign-cert now only works with Puppet 4.
 
