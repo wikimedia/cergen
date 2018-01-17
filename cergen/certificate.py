@@ -157,8 +157,10 @@ class Certificate(AbstractSigner):
 
         # Certificate Signing Request file in .pem format.
         self.csr_file = os.path.join(self.path, '{}.csr.pem'.format(self.name))
-        # Public Signed Certificate file in .pem format
+        # x509 Certificate file in .pem format
         self.crt_file = os.path.join(self.path, '{}.crt.pem'.format(self.name))
+        # Authority's x509 Certificate file in .pem format
+        self.ca_crt_file = os.path.join(self.path, 'ca.crt.pem')
         # PKCS#12 'keystore' file
         self.p12_file = os.path.join(self.path, '{}.keystore.p12'.format(self.name))
         # Java Keystore file
@@ -263,6 +265,7 @@ class Certificate(AbstractSigner):
         self.key.generate(force=force)
         self.generate_crt(force=force)
         # TODO: maybe rename these subordinate generate methods?
+        self.generate_ca_crt(force=force)
         self.generate_p12(force=force)
         self.generate_keystore(force=force)
         self.generate_truststore(force=force)
@@ -358,6 +361,35 @@ class Certificate(AbstractSigner):
             f.write(csr.public_bytes(serialization.Encoding.PEM))
 
         return csr
+
+    def generate_ca_crt(self, force=False):
+        """
+        Copies the authority's certificate in .pem format
+        into this certificate's path under the name 'ca.crt.pem'.
+        This is useful so the CA certificate can be easily distributed.
+
+        Args:
+            force (bool, optional)
+
+        Raises:
+            RuntimeError: if a a new certificate cannot be signed by the authority
+                or verified by the authority chain.
+
+        """
+        if not self.should_generate(self.ca_crt_file, force):
+            return False
+
+        self.log.info('Generating CA certificate file')
+
+        # The authority has a local cert_file.  Copy it to this Certificate's path.
+        shutil.copyfile(self.authority.cert_file, self.ca_crt_file)
+
+        # Verify that crt_file was created.
+        if not os.path.exists(self.ca_crt_file):
+            raise RuntimeError(
+                '{} does not exist even though we copied it from {}. '
+                ' This should not happen.'.format(self.ca_crt_file, self.authority.cert_file)
+            )
 
     def generate_p12(self, force=False):
         """
@@ -522,6 +554,7 @@ class Certificate(AbstractSigner):
             self.key.private_key_file,
             self.key.public_key_file,
             self.crt_file,
+            self.ca_crt_file,
             self.p12_file,
             self.jks_file,
             self.truststore_jks_file
