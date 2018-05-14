@@ -168,14 +168,18 @@ def test_dict_to_x509_name():
         cergen.certificate.dict_to_x509_name(subject)
 
 
-def test_dns_names_to_x509_san():
+def test_names_to_x509_san():
     from cryptography import x509
 
     alt_names = ['me.you.org', '*.example.com']
-    san = cergen.certificate.dns_names_to_x509_san(alt_names)
+    san = cergen.certificate.names_to_x509_san(alt_names)
     assert san.get_values_for_type(x509.DNSName) == alt_names, \
         'DNS names should match provided alt_names'
-
+    alt_names = [ '192.168.1.1' ]
+    san = cergen.certificate.names_to_x509_san(alt_names)
+    for i, addr in enumerate(san.get_values_for_type(x509.IPAddress)):
+        assert addr.compressed == alt_names[i], \
+            'IP addresses should match provided alt_names'
 
 def test_is_in_p12_keystore(certificate):
     certificate.generate()
@@ -197,4 +201,3 @@ def test_is_in_java_keystore(certificate):
     assert not cergen.certificate.is_in_keystore(
         'NONYA', certificate.jks_file, 'temp_password'
     ), 'NONYA should not be in the java keystore'
-

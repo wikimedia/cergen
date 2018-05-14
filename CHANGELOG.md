@@ -1,3 +1,6 @@
+# 0.2.2
+- IP subject alternate names are now supported transparently
+
 # 0.2.1
 - Now also generate ca.crt.pem files in each certificate directory.
 

@@ -65,7 +65,7 @@ A manifest is a dictionary of names to entry kwargs.  The default entry that wil
 instantiated is a Certificate.  A Certificate represents a locally stored Certificate.
 Other entry types can be instantiated by setting the special `class_name` config.
 This should be set to a fully qualified class name that can be loaded from the Python path.
-The `class_name` must refer to a class that implements AbstractSigner and its abstract methods.  
+The `class_name` must refer to a class that implements AbstractSigner and its abstract methods.
 The remaining entry kwargs will be passed to the class's constructor.
 
 ```
@@ -92,7 +92,7 @@ hostname1.example.org:
   subject:
     country_name: US
     state_or_province_name: VA
-  # DNS subject alternate names to put in the SAN (optional)
+  # DNS/IP subject alternate names to put in the SAN (optional)
   alt_names: [*.example.org, yeehaw.com]
   # Key class configuration
   key:

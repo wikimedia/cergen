@@ -41,7 +41,7 @@ hostname1.example.org:
   subject:
     country_name: US
     STATE_OR_PROVINCE_NAME: US
-  alt_names: [me.we.you, fine.com, woohoo.org]
+  alt_names: [me.we.you, fine.com, woohoo.org, '192.168.1.199']
   key:
     algorithm: rsa
     password: qwerty

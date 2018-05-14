@@ -9,13 +9,13 @@ except IOError:
 
 setup(
     name='cergen',
-    version='0.2.1',
+    version='0.2.2',
     description='Automated x509 certificate generation and management',
     license='Apache',
     author='Andrew Otto',
     packages=find_packages(),
     python_requires='>=3',
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner', 'setuptools_scm < 2.0.0'],
     tests_require=['pytest'],
     install_requires=[
         'docopt>=0.6',
