@@ -1,0 +1,17 @@
+Description: Remove dependency from setuptools_scm < 2.0.0, needed for CI
+ The addition of setuptools_scm as an explicit setup dependency is a workaround
+ for a bug in wikimedia's CI, but it prevents properly building the package.
+ Remove it when actually performing a debian build.
+diff --git a/setup.py b/setup.py
+index b09c1b9..799e857 100644
+--- a/setup.py
++++ b/setup.py
+@@ -15,7 +15,7 @@ setup(
+     author='Andrew Otto',
+     packages=find_packages(),
+     python_requires='>=3',
+-    setup_requires=['pytest-runner', 'setuptools_scm < 2.0.0'],
++    setup_requires=['pytest-runner'],
+     tests_require=['pytest'],
+     install_requires=[
+         'docopt>=0.6',
