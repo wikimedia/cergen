@@ -1,4 +1,5 @@
 import datetime
+import ipaddress
 import os
 import shutil
 
@@ -75,7 +76,7 @@ class Certificate(AbstractSigner):
                 Defaults to path.
 
             alt_names (list of str, optional):
-                List of DNS subject alternate names to include.  Defaults to None.
+                List of subject alternate names to include.  Defaults to None.
 
             expiry (datetime or int, optional):
                 Expiry datetime, or expiry int days from now.  Defaults to 365.
@@ -126,9 +127,9 @@ class Certificate(AbstractSigner):
         subject['COMMON_NAME'] = name
         self.x509_name = dict_to_x509_name(subject)
 
-        # If we are given dns_alt_names, convert them an x509.SubjectAlternativeName.
+        # If we are given alt_names, convert them an x509.SubjectAlternativeName.
         if alt_names:
-            self.x509_san = dns_names_to_x509_san(alt_names)
+            self.x509_san = names_to_x509_san(alt_names)
         else:
             self.x509_san = None
 
@@ -655,10 +656,10 @@ def dict_to_x509_name(d):
     )
 
 
-def dns_names_to_x509_san(names):
+def names_to_x509_san(names):
     """
     Given a list of subject alternate names,
-    create a new x509.SubjectAlternativeName object made up of x509.DNSName oebjects.
+    create a new x509.SubjectAlternativeName object made up of x509.DNSName/ x509.IPAddress objects.
 
     Args:
         names (list of str): list of SAN strings.
@@ -666,9 +667,15 @@ def dns_names_to_x509_san(names):
     Returns:
         x509.SubjectAlternativeName
     """
-    return x509.SubjectAlternativeName(
-        [x509.DNSName(name) for name in names]
-    )
+    altnames = []
+    for name in names:
+        try:
+            ip = ipaddress.ip_address(name)
+            altnames.append(x509.IPAddress(ip))
+        except (ValueError, TypeError):
+            altnames.append(x509.DNSName(name))
+
+    return x509.SubjectAlternativeName(altnames)
 
 
 def is_in_keystore(alias, keystore_file, password, storetype=None):

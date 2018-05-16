@@ -9,13 +9,13 @@ except IOError:
 
 setup(
     name='cergen',
-    version='0.2.1',
+    version='0.2.2',
     description='Automated x509 certificate generation and management',
     license='Apache',
     author='Andrew Otto',
     packages=find_packages(),
     python_requires='>=3',
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner', 'setuptools_scm < 2.0.0'],
     tests_require=['pytest'],
     install_requires=[
         'docopt>=0.6',
@@ -25,10 +25,12 @@ setup(
         # We want a version with Debian packages.
         'networkx<2.0',
         'requests>=2',
-        'pyOpenSSL>=16.0.0'
+        # 17.5.0 requires cryptography 2.1.4
+        'pyOpenSSL>=16.0.0,<17.5.0',
         # Also need installed
         # python3-dev
         # libffi-dev
+        # libssl-dev
     ],
     long_description=long_description,
     entry_points={'console_scripts': ['cergen = cergen.main:main']},

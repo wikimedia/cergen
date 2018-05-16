@@ -122,11 +122,9 @@ def csr(key):
     csr = x509.CertificateSigningRequestBuilder().subject_name(
         util.dict_to_x509_name(subject)
     ).add_extension(
-        util.dns_names_to_x509_san(['me.you.org', '*.example.com']), critical=False
+        util.names_to_x509_san(['me.you.org', '*.example.com']), critical=False
     )
 
     # Sign the CSR with our private key
     csr = csr.sign(key.key, hashes.SHA256(), default_backend())
     return csr
-
-
