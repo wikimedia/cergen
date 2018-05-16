@@ -1,3 +1,9 @@
+cergen (0.2.2-1) stretch-wikimedia; urgency=low
+
+  * Allow generation of IP-based SANs
+
+ -- Giuseppe Lavagetto <glavagetto@wikimedia.org>  Wed, 16 May 2018 13:00:20 +0200
+
 cergen (0.2.1-1) jessie-wikimedia; urgency=low
 
   * Now generate ca.crt.pem files in each certificate directory
