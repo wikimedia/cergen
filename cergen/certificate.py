@@ -3,6 +3,8 @@ import ipaddress
 import os
 import shutil
 
+from inspect import signature
+
 from cryptography import x509
 from cryptography.x509.oid import NameOID
 from cryptography.hazmat.backends import default_backend
@@ -20,6 +22,11 @@ Defaults to 'openssl', or the value of the environment variable OPENSSL_BIN
 KEYTOOL = os.getenv('KEYTOOL_BIN', 'keytool')
 """str: Path to java keytool CLI.
 Defaults to 'keytool', or the environment variable KEYTOOL_BIN
+"""
+
+X509_KEY_USAGES = signature(x509.KeyUsage).parameters.keys()
+"""list: All allowed key usages,
+They're extracted from cryptography.x509.KeyUsage's constructor
 """
 
 
@@ -45,6 +52,7 @@ class Certificate(AbstractSigner):
         key,
         path,
         subject=None,
+        key_usage=None,
         private_path=None,
         alt_names=None,
         expiry=365,
@@ -70,6 +78,10 @@ class Certificate(AbstractSigner):
                 names in the cryptography.x509.oid.NameOID module.
                 COMMON_NAME will be set to name.
                 Defaults to None (empty subject).
+
+            key_usage (list, optional):
+                If not None, a list of key usages that the certificate should be authorized for.
+                Valid values can be found at `pydoc crypotgraphy.x509.KeyUsage`
 
             private_path (str, optional):
                 Path to directory where private key files are generated and stored.
@@ -127,6 +139,9 @@ class Certificate(AbstractSigner):
         subject['COMMON_NAME'] = name
         self.x509_name = dict_to_x509_name(subject)
 
+        # Key usage: default is no key usage.
+        self.x509_key_usage = None
+
         # If we are given alt_names, convert them an x509.SubjectAlternativeName.
         if alt_names:
             self.x509_san = names_to_x509_san(alt_names)
@@ -152,9 +167,18 @@ class Certificate(AbstractSigner):
         self.is_authority = is_authority
         if self.is_authority:
             self.x509_constraints = x509.BasicConstraints(ca=True, path_length=path_length)
+            key_usage = ['key_cert_sign', 'crl_sign']
         # Else ensure that this certificate will not be allowed to sign other certificates.
         else:
             self.x509_constraints = x509.BasicConstraints(ca=False, path_length=None)
+
+        # Also save the key usage in this case
+        if key_usage is not None:
+            spurious = set(key_usage) - set(X509_KEY_USAGES)
+            if spurious:
+                raise ValueError("{}: Invalid key usages: {}"
+                                 .format(self.name, ', '.join(spurious)))
+            self.x509_key_usage = x509.KeyUsage(*[(k in key_usage) for k in X509_KEY_USAGES])
 
         # Certificate Signing Request file in .pem format.
         self.csr_file = os.path.join(self.path, '{}.csr.pem'.format(self.name))
@@ -341,6 +365,10 @@ class Certificate(AbstractSigner):
             csr = csr.add_extension(
                 self.x509_constraints, critical=True
             )
+
+        # Add keyUsage extensions
+        if self.x509_key_usage:
+            csr = csr.add_extension(self.x509_key_usage, critical=False)
 
         # Add SubjectKeyIdentifier from this Certificate's public key
         subject_key_identifier = x509.SubjectKeyIdentifier.from_public_key(

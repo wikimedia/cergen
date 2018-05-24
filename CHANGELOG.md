@@ -1,3 +1,6 @@
+# 0.2.3
+- Add support for keyUsage extensions
+
 # 0.2.2
 - IP subject alternate names are now supported transparently
 
