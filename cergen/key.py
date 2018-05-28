@@ -103,10 +103,19 @@ class Key(object):
         """
         Loads private_key_file into self.key
         """
+        pw_bytes = None
+        if self.password is not None:
+            pw_bytes = bytes(self.password, 'utf-8')
+
         with open(self.private_key_file, 'rb') as f:
-            self.key = serialization.load_pem_private_key(
-                f.read(), bytes(self.password, 'utf-8'), backend=default_backend()
-            )
+            try:
+                self.key = serialization.load_pem_private_key(
+                    f.read(), pw_bytes, backend=default_backend()
+                )
+            except TypeError as e:
+                print("Error decoding the existing key for {},"
+                      " maybe you forgot to provide a password?".format(self.name))
+                raise
 
     def write(self):
         """
