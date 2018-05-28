@@ -291,9 +291,13 @@ class Certificate(AbstractSigner):
         self.generate_crt(force=force)
         # TODO: maybe rename these subordinate generate methods?
         self.generate_ca_crt(force=force)
-        self.generate_p12(force=force)
-        self.generate_keystore(force=force)
-        self.generate_truststore(force=force)
+        if self.key.password is not None:
+            self.generate_p12(force=force)
+            self.generate_keystore(force=force)
+            self.generate_truststore(force=force)
+        else:
+            self.log.info("{}: NOT re-generating the PKCS12 and java keystores "
+                          "as no password was provided".format(self.name))
 
     def generate_crt(self, force=False):
         """
