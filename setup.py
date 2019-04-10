@@ -9,7 +9,7 @@ except IOError:
 
 setup(
     name='cergen',
-    version='0.2.3',
+    version='0.2.4',
     description='Automated x509 certificate generation and management',
     license='Apache',
     author='Andrew Otto',

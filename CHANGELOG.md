@@ -1,8 +1,11 @@
+# 0.2.4
+- Better error message when attempting to regenerate a Puppet signed certificate.
+
 # 0.2.3
-- Add support for keyUsage extensions
+- Add support for keyUsage extensions.
 
 # 0.2.2
-- IP subject alternate names are now supported transparently
+- IP subject alternate names are now supported transparently.
 
 # 0.2.1
 - Now also generate ca.crt.pem files in each certificate directory.

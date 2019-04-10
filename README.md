@@ -152,3 +152,10 @@ Certificates are Signers, in that they can always at least sign themselves.  Cer
 that can sign other certificates are considered to be 'authorities'.  cergen
 originally used the term 'Authority' rather than 'Signer', but this was found
 conflate the usual conceptual hierarchy of certificates and authorities.
+
+
+## Python cryptography & libssl
+
+Cergen requires Python cryptography < 2.0.0.  These versions are not compatible with libssl1.1.
+You'll need to have a libssl1.0-dev library installed to build and install the required
+cryptography version.  On Debian Stretch: `apt-get install libssl1.0-dev`.

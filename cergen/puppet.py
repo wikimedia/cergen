@@ -116,8 +116,9 @@ class PuppetCA(AbstractSigner):
             self.log.debug('CSR for %s to %s succeeded.', common_name, url)
         else:
             raise RuntimeError(
-                'CSR for %s to %s failed with HTTP status code %s: %s',
-                common_name, url, response.status_code, response.text
+                'CSR for {} to {} failed with HTTP status code {}: {}'.format(
+                    common_name, url, response.status_code, response.text
+                )
             )
 
     def get_cert(self, common_name):
@@ -179,15 +180,21 @@ class PuppetCA(AbstractSigner):
             )
 
         # Check Puppet doesn't already have a certificate with this common name.
+        preexisting_cert = None
         try:
-            if self.get_cert(common_name):
-                self.log.warn(
-                    'CSR for %s to %s has already been submitted and signed. '
-                    'Not submitting again.', common_name, self.name
-                )
-                return
+            preexisting_cert = self.get_cert(common_name)
         except RuntimeError:
             pass
+
+        if preexisting_cert is not None:
+            raise RuntimeError(
+                '{0} already has a signed certificate for {1}. '
+                'If you are trying to regenerate a Puppet CA signed certificate, '
+                'you need to first remove the certificate from the Puppet CA. '
+                'On the puppetmaster, `puppet cert clean {1}` should do it.'.format(
+                    self.name, common_name
+                )
+            )
 
         csr_bytes = csr.public_bytes(serialization.Encoding.PEM)
         self.send_csr(common_name, csr_bytes)
@@ -198,7 +205,7 @@ class PuppetCA(AbstractSigner):
 
         self.log.debug('Signing CSR for %s', common_name)
         if not run_command(command):
-            raise RuntimeError('Sign of CSR for %s failed', common_name)
+            raise RuntimeError('Sign of CSR for {} failed'.format(common_name))
 
         # Great, puppet signed the certificate!  Get it!
         return self.get_cert(common_name)
