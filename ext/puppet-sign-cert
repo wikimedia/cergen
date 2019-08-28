@@ -18,7 +18,7 @@ require 'puppet'
 require 'puppet/ssl/certificate_authority'
 require 'puppet/util/command_line'
 
-class PuppetCertifcateSignError < StandardError
+class PuppetCertificateSignError < StandardError
 end
 
 
@@ -75,11 +75,11 @@ if __FILE__ == $0;
 
   common_name = ARGV.shift || ''
 
-  fail(PuppetCertifcateSignError, 'You must provide a common name') unless common_name != ''
+  fail(PuppetCertificateSignError, 'You must provide a common name') unless common_name != ''
 
   begin
     sign_csr(common_name)
-  rescue PuppetCertifcateSignError => e
+  rescue PuppetCertificateSignError => e
     Log.error "#{e.message}"
     exit 1
   end
