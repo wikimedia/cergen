@@ -1,3 +1,22 @@
+cergen (0.2.4-1+deb10u2) buster-wikimedia; urgency=medium
+
+  * Rebuild with revised setup.py config which simply uses the
+    python-cryptography and pyopenssl packages as shipped in buster
+
+ -- Moritz Muehlenhoff <mmuhlenhoff@wikimedia.org>  Mon, 14 Oct 2019 17:44:09 +0200
+
+cergen (0.2.4-1+deb10u1) buster-wikimedia; urgency=medium
+
+  * Bump version for buster rebuild
+
+ -- Moritz Muehlenhoff <mmuhlenhoff@wikimedia.org>  Mon, 14 Oct 2019 14:56:07 +0200
+
+cergen (0.2.4-1) stretch-wikimedia; urgency=medium
+
+  * Better error message when attempting to regenerate a Puppet signed certificate
+
+ -- Andrew Otto (WMF) <otto@wikimedia.org>  Wed, 10 Apr 2019 14:52:56 +0000
+
 cergen (0.2.3-1) stretch-wikimedia; urgency=medium
 
   * Allow adding keyUsage extensions
