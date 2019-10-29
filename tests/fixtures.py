@@ -66,6 +66,7 @@ def certificate_kwargs(tmpdir, scope='session'):
         },
         'key': {'password': 'temp_password'},
         'path': str(tmpdir),
+        'truststore_password': 'test-2-123456',
     }
 
 @fixture
