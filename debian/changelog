@@ -1,3 +1,9 @@
+cergen (0.2.5-1+deb10u1) buster-wikimedia; urgency=medium
+
+  * Release version 0.2.5
+
+ -- Luca Toscano <ltoscano@wikimedia.org>  Wed, 30 Oct 2019 18:44:09 +0200
+
 cergen (0.2.4-1+deb10u2) buster-wikimedia; urgency=medium
 
   * Rebuild with revised setup.py config which simply uses the
