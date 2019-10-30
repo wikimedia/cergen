@@ -1,3 +1,13 @@
+# 0.2.5
+
+- Improve error handling and logging when getting certificate from puppetmaster
+
+- Differentiate between a non existent cert and an internal server error.
+
+- Fix type in puppet-sign-cert script.
+
+- Allow Java Trustores to have a separate password.
+
 # 0.2.4
 - Better error message when attempting to regenerate a Puppet signed certificate.
 
