@@ -116,19 +116,22 @@ class PuppetCA(AbstractSigner):
             self.log.debug('CSR for %s to %s succeeded.', common_name, url)
         else:
             raise RuntimeError(
-                'CSR for %s to %s failed with HTTP status code %s: %s',
-                common_name, url, response.status_code, response.text
+                'CSR for {} to {} failed: {} {}: {}'.format(
+                    common_name, url, response.status_code, response.reason, response.text
+                )
             )
 
     def get_cert(self, common_name):
         """
         Gets the certificate named common_name from the Puppet CA API, and
         returns it as an cryptography.x509.Certificate.
+        If the Puppet CA does not have a certificate with common_name (returns 404)
+        this returns None.
 
         common_name (str): common name of certificate to get from Puppet CA API.
 
         Returns:
-            cryptography.x509.Certificate
+            cryptography.x509.Certificate or None
         """
         url = '{}/certificate/{}'.format(self.api_uri, common_name)
         self.log.debug('Getting signed certificate for %s from %s', common_name, url)
@@ -141,11 +144,12 @@ class PuppetCA(AbstractSigner):
             return x509.load_pem_x509_certificate(
                 bytes(response.text, 'utf-8'), backend=default_backend()
             )
+        elif response.status_code == 404:
+            return None
         else:
             raise RuntimeError(
-                'Could not get signed certificate for {} from {}, '
-                'failed with HTTP status code {}: {}'.format(
-                    common_name, url, response.status_code, response.text
+                'Failed getting signed certificate for {} from {}: {} {}: {}'.format(
+                    common_name, url, response.status_code, response.reason, response.text
                 )
             )
 
@@ -178,16 +182,17 @@ class PuppetCA(AbstractSigner):
                 'It will always choose an expiration of 5 years from now.', common_name
             )
 
-        # Check Puppet doesn't already have a certificate with this common name.
-        try:
-            if self.get_cert(common_name):
-                self.log.warn(
-                    'CSR for %s to %s has already been submitted and signed. '
-                    'Not submitting again.', common_name, self.name
+        # Check that Puppet doesn't already have a certificate with this common name.
+        preexisting_cert = self.get_cert(common_name)
+        if preexisting_cert is not None:
+            raise RuntimeError(
+                '{0} already has a signed certificate for {1}. '
+                'If you are trying to regenerate a Puppet CA signed certificate, '
+                'you need to first remove the certificate from the Puppet CA. '
+                'On the puppetmaster, `puppet cert clean {1}` should do it.'.format(
+                    self.name, common_name
                 )
-                return
-        except RuntimeError:
-            pass
+            )
 
         csr_bytes = csr.public_bytes(serialization.Encoding.PEM)
         self.send_csr(common_name, csr_bytes)
@@ -198,7 +203,7 @@ class PuppetCA(AbstractSigner):
 
         self.log.debug('Signing CSR for %s', common_name)
         if not run_command(command):
-            raise RuntimeError('Sign of CSR for %s failed', common_name)
+            raise RuntimeError('Sign of CSR for {} failed'.format(common_name))
 
         # Great, puppet signed the certificate!  Get it!
         return self.get_cert(common_name)

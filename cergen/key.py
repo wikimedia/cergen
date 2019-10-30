@@ -114,7 +114,7 @@ class Key(object):
                 )
             except TypeError as e:
                 print("Error decoding the existing key for {},"
-                      " maybe you forgot to provide a password?".format(self.name))
+                      " maybe you forgot to provide a password? {}".format(self.name, e))
                 raise
 
     def write(self):

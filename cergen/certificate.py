@@ -59,7 +59,8 @@ class Certificate(AbstractSigner):
         authority=None,
         is_authority=False,
         path_length=None,
-        read_only=False
+        read_only=False,
+        truststore_password=None,
     ):
         """
         Certificate constructor.
@@ -111,6 +112,15 @@ class Certificate(AbstractSigner):
                 refer to certificate .pem files (perhaps to sign other certificates),
                 but want to be sure you won't accidentally overwrite those files by
                 calling generate(force=True).  Defaults to False.
+
+            truststore_password(str, optional):
+                If not None, the string is used as password for the Java truststore.
+                If None, the key's password will be used instead.
+                Please note: different store and key passwords are not supported for
+                PKCS12 KeyStores, this is why only the Trustore password can be set.
+                Defaults to None.
+
+
         """
         self._name = name
         super().__init__()
@@ -199,6 +209,9 @@ class Certificate(AbstractSigner):
         # This is the crypotgraphy.x509.Certificate object.
         # It will either be set by load() or generate_crt()
         self.x509_cert = None
+
+        self.truststore_password = self.key.password \
+            if truststore_password is None else truststore_password
 
         if self.exists():
             self.log.debug('%s exists, loading', self.crt_file)
@@ -294,9 +307,14 @@ class Certificate(AbstractSigner):
         if self.key.password is not None:
             self.generate_p12(force=force)
             self.generate_keystore(force=force)
+        else:
+            self.log.info("{}: NOT re-generating the Openssl PKCS12 keystore "
+                          "and Java keystore as no password was provided"
+                          .format(self.name))
+        if self.truststore_password is not None:
             self.generate_truststore(force=force)
         else:
-            self.log.info("{}: NOT re-generating the PKCS12 and java keystores "
+            self.log.info("{}: NOT re-generating the Java truststore "
                           "as no password was provided".format(self.name))
 
     def generate_crt(self, force=False):
@@ -550,7 +568,7 @@ class Certificate(AbstractSigner):
             '-noprompt',
             '-alias', self.authority.name,
             '-file', self.authority.crt_file,
-            '-storepass', self.key.password,
+            '-storepass', self.truststore_password,
             '-keystore', self.truststore_jks_file
         ]
 
@@ -563,7 +581,8 @@ class Certificate(AbstractSigner):
             )
 
         # Verify that the CA cert is in the Java truststore.
-        if not is_in_keystore(self.authority.name, self.truststore_jks_file, self.key.password):
+        if not is_in_keystore(self.authority.name, self.truststore_jks_file,
+                              self.truststore_password):
             raise RuntimeError(
                 'Java truststore generation and import of CA certificate '
                 'succeeded, but a certificate for {} is not in {}.  '
