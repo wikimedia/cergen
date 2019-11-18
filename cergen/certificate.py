@@ -1,4 +1,5 @@
 import datetime
+import dateutil.parser
 import ipaddress
 import os
 import shutil
@@ -161,6 +162,9 @@ class Certificate(AbstractSigner):
         # If expiry was given as an int, assume it is days from now
         if isinstance(expiry, int):
             self.expiry = datetime.datetime.utcnow() + datetime.timedelta(days=expiry)
+        # Else it should be an ISO-8601 string
+        elif isinstance(expiry, str):
+            self.expiry = dateutil.parser.parse(expiry)
         # Else it should be an expiration datetime.
         else:
             self.expiry = expiry

@@ -19,6 +19,7 @@ setup(
     tests_require=['pytest'],
     install_requires=[
         'docopt>=0.6',
+        'python-dateutil>=2.5.0',
         'pyyaml>=3',
         'cryptography',
         # networkx released 2.x in September 2017.
