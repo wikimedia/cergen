@@ -23,7 +23,7 @@ setup(
         'pyyaml>=3',
         'cryptography',
         # networkx released 2.x in September 2017.
-        # We want a version with Debian packages.
+        # We want a version with Debian packages (in component/cergen)
         'networkx<2.0',
         'requests>=2',
         'pyOpenSSL',
