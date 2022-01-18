@@ -1,4 +1,5 @@
 import datetime
+import dateutil.parser
 import ipaddress
 import os
 import shutil
@@ -153,14 +154,18 @@ class Certificate(AbstractSigner):
         self.x509_key_usage = None
 
         # If we are given alt_names, convert them an x509.SubjectAlternativeName.
+        # And make sure to include CN in SAN.
         if alt_names:
-            self.x509_san = names_to_x509_san(alt_names)
+            self.x509_san = names_to_x509_san(set(alt_names + [name]))
         else:
-            self.x509_san = None
+            self.x509_san = names_to_x509_san([name])
 
         # If expiry was given as an int, assume it is days from now
         if isinstance(expiry, int):
             self.expiry = datetime.datetime.utcnow() + datetime.timedelta(days=expiry)
+        # Else it should be an ISO-8601 string
+        elif isinstance(expiry, str):
+            self.expiry = dateutil.parser.parse(expiry)
         # Else it should be an expiration datetime.
         else:
             self.expiry = expiry
@@ -713,7 +718,7 @@ def names_to_x509_san(names):
     create a new x509.SubjectAlternativeName object made up of x509.DNSName/ x509.IPAddress objects.
 
     Args:
-        names (list of str): list of SAN strings.
+        names (iterable of str): list of SAN strings.
 
     Returns:
         x509.SubjectAlternativeName

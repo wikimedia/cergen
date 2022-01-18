@@ -1,3 +1,9 @@
+# 0.2.6
+
+- Fix expiry datetime parsing from ISO-8601 string in manifest yaml.
+
+- Make sure Common Name is always included in Subject Alt Name
+
 # 0.2.5
 
 - Improve error handling and logging when getting certificate from puppetmaster

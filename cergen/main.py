@@ -26,7 +26,7 @@ Options:
 
     -g --generate                   Generate selected certificates and files.
 
-    -F --force                      If not provied --force, any existing files will not be
+    -F --force                      If not provided any existing files will not be
                                     overwritten.  If want to overwrite files, provide --force.
 
     -m --manifest-glob=<glob>       If <manifest_path> is a directory, this glob will be used to

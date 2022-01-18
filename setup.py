@@ -9,7 +9,7 @@ except IOError:
 
 setup(
     name='cergen',
-    version='0.2.5',
+    version='0.2.6',
     description='Automated x509 certificate generation and management',
     license='Apache',
     author='Andrew Otto',
@@ -19,10 +19,11 @@ setup(
     tests_require=['pytest'],
     install_requires=[
         'docopt>=0.6',
+        'python-dateutil>=2.5.0',
         'pyyaml>=3',
         'cryptography',
         # networkx released 2.x in September 2017.
-        # We want a version with Debian packages.
+        # We want a version with Debian packages (in component/cergen)
         'networkx<2.0',
         'requests>=2',
         'pyOpenSSL',
